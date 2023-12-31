@@ -1,13 +1,14 @@
 const User = require('../model/User');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-const generateJwt = require('../config/generate_token');
+const passport = require("passport");
+const path = require('path');
 
 const checkExistingUser = async(user) => {
     try{
-        const user = await User.findOne({email: user.email});
+        const newuser = await User.findOne({email: user.email});
 
-        if(user){
+        if(newuser){
             return false;
         }else{
             return true;
@@ -22,13 +23,19 @@ const register = async(req, res) => {
     try{
         const user = req.body;
 
-        if(checkExistingUser(user)) res.status(400).json({message: "User already exists"});
+        if(!checkExistingUser(user)) res.status(400).json({message: "User already exists"});
         
         else{
-            const salt = bcrypt.genSalt(10);
-            const hash = bcrypt.hash(user.password, salt);
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(user.password, salt);
+           
+            const newUser = {
+                name: user.name,
+                email: user.email,
+                password: hash
+            }
 
-            const newUser = await User.create(user);
+            await User.create(newUser);
 
             res.status(200).json({message: "User created successfully"});
         }    
@@ -39,26 +46,40 @@ const register = async(req, res) => {
     }
 }
 
-const login = async(req, res) => {
-    try{
-        const credentials = req.body;
+const login = async(req, res, next) => {
+    passport.authenticate("local", {
+        successRedirect: "/auth/welcome",
+        failureRedirect: "/auth/login",
+        failureFlash: true,
+    })(req, res, next);
+}
 
-        const user = await User.findOne({email: credentials.email});
+const getLogin = async (req, res) => {
+    const filePath = path.join(__dirname, "..", "views", "login.html");
+    res.sendFile(filePath);
+};
 
-        if(!user) res.status(400).json({message: "User does not exist"});
+const getSignUp = async (req, res) => {
+    const filePath = path.join(__dirname, "..", "views", "signup.html");
+    res.sendFile(filePath);
+};
 
-        else{
-            const match = await bcrypt.compare(credentials.password, user.password);
+const getWelcome = async(req, res) => {
+    const filePath = path.join(__dirname, "..", "views", "welcome.html");
+    res.sendFile(filePath);
+};
 
-            if(!match){
-                res.status(400).json({message: "Password does not match"});
-            }else{
-                const token = generateJwt(user);
-                res.status(200).json({message: "Successfully logged in", token:token});
-            }
-        }
-    
-    }catch(error){
-        console.log(error);
-    }
+const logout = async(req, res) => {
+    req.logout(function(err) {
+        if (err) { return next(err); }
+        res.redirect('/auth/login');
+    });
+}
+module.exports = {
+    register,
+    login,
+    getLogin,
+    getSignUp,
+    getWelcome,
+    logout
 }

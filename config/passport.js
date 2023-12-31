@@ -1,28 +1,46 @@
-const passport = require('passport');
-const { ExtractJwt } = require('passport-jwt');
-const JwtStrategy = require('passport-jwt').Strategy;
-require('dotenv').config();
-const User = require('../model/User');
+const LocalStrategy = require('passport-local').Strategy
+const bcrypt = require('bcrypt')
+const User = require("../model/User");
 
-passport.use(new JwtStrategy({
-    secretOrKey: process.env.JWT_SECRET,
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
-}, async(payload, done) => {
-    const user = await User.findById(payload.sub);
-    if(user){
-        done(null, {id: user._id});
-    }else{
-        done(null, false);
+function initialize(passport) {
+  const authenticateUser = async (email, password, done) => {
+
+       User.findOne({ email: email })
+       .then((user) => {
+         if (!user) {
+            console.log("User not found");
+           return done(null, false, {
+             message: "User not found",
+           });
+         } else {
+           bcrypt.compare(password, user.password, (err, isMatch) => {
+             if (err) throw err;
+             if (isMatch) {
+               return done(null, user);
+             } else {
+                console.log('incorrect password');
+               return done(null, false, { message: "Incorrect Password" });
+             }
+           });
+         }
+       })
+       .catch((err) => {
+         console.log(err);
+       });
+  }
+
+  passport.use(new LocalStrategy({ usernameField: 'email' }, authenticateUser)) 
+  passport.serializeUser((user, done) =>{
+    done(null, user.id)
+  }) 
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err, null);
     }
-}));
+  });
+}
 
-passport.serializeUser((user, done)=> {
-    done(null, user.id);
-});
-
-passport.deserializeUser(async(user, done) => {
-    done(null, user.id);
-
-});
-
-module.exports = passport;
+module.exports = initialize;
