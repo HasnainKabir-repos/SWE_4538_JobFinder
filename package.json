@@ -19,6 +19,7 @@
     "express-session": "^1.17.3",
     "flash": "^1.1.0",
     "mongoose": "^8.0.3",
+    "nodemailer": "^6.9.8",
     "nodemon": "^3.0.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

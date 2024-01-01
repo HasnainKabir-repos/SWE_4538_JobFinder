@@ -5,7 +5,11 @@ const {
     getLogin,
     getSignUp,
     getWelcome,
-    logout
+    logout,
+    getForgotPass,
+    sendResetLink,
+    updatePassword,
+    getUserID
 } = require('../controller/auth.controller');
 
 const isAuthenticated = require('../middleware/auth.middleware');
@@ -18,4 +22,11 @@ router.get('/login', getLogin);
 router.get('/welcome', isAuthenticated, getWelcome);
 
 router.post('/logout', logout);
+
+router.get('/forgot_pass', getForgotPass);
+
+router.get('/reset', sendResetLink);
+
+router.get('/reset/:id', getUserID);
+router.post('/reset', updatePassword);
 module.exports = router;
