@@ -1,32 +1,27 @@
 const supertest = require('supertest');
-const server = require('../server');
 const app = require('../app');
 const chai = require('chai');
-const expect = chai.expect;
+const { assert } = require("chai");
 
 describe('Testing root of project', () =>{
-    after(async () => {
-        await server.close();
-    });
-    it("should return a 200 status code" , (done) => {
+    
+    it("should return a 200 status code" , () => {
         supertest(app)
         .get('/')
         .expect(200)
         .end((err, res) => {
             if(err)
             console.log(err);
-            done();
         });
     });
-    it("should return a Hello world response", (done) => {
+    it("should return a Hello world response", () => {
         supertest(app)
         .get('/')
         .expect(200)
         .end((err, res) => {
             if (err) console.log(err);
 
-            expect(res.body.message).to.equal("Hello world");
-            done();
+            assert.equal(res.body.message, "Hello world");
         });
     });
 });

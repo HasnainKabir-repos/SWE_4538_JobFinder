@@ -36,4 +36,13 @@ const auth = require('./routes/auth.route');
 
 app.use('/auth', auth);
 
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/auth/login' }),
+  function(req, res) {
+    res.redirect('/auth/welcome');
+  });
+
 module.exports = app;
