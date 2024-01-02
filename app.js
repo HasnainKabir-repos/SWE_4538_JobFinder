@@ -45,4 +45,11 @@ app.get('/auth/google/callback',
     res.redirect('/auth/welcome');
   });
 
+const jobs = require('./routes/job.route');
+
+app.use('/job', jobs);
+
+const profile = require('./routes/profile.route');
+app.use('/profile', profile);
+
 module.exports = app;
