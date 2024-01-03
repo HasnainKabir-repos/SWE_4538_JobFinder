@@ -25,19 +25,19 @@ To start this project, do the following:
 The features are mostly divided into two categories based on their purpose relating to Jobs, Users or authentication.
 
 ### Authentication
-Login and Signup features
-Ability to reset password
+Login and Signup features <br>
+Ability to reset password<br>
 Authentication using Google account
 
 ### Job
-Creating jobs
-Editing or updating jobs
-Deleting jobs
-Searching for jobs
+Creating jobs<br>
+Editing or updating jobs<br>
+Deleting jobs<br>
+Searching for jobs<br>
 Filtering search results
 
 ### Users
-Creating user profile
-Editing or updating profiles
-Adding images to profiles
+Creating user profile<br>
+Editing or updating profiles<br>
+Adding images to profiles<br>
 Adding video resume
